@@ -1,22 +1,36 @@
 # pip install contextily geopandas shapely
+import numpy as np
 import matplotlib.pyplot as plt
 import contextily as ctx
 import geopandas as gpd
 from shapely.geometry import Point
 from pyproj import Transformer
 from matplotlib.ticker import MaxNLocator, FuncFormatter
+from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+import matplotlib.font_manager as fm
 
 # Hanoi Center Coordinates
-lat, lon = 21.0285, 105.8542  
+lat_0, lon_0 = 21.0285, 105.8542  
+
+
+
+data = np.loadtxt("GPS.dat", delimiter=",", skiprows=1)  # Load your data from a text file
+GPS_time = data[:, 0]  # Assuming the first column is time
+GPS_lat = data[:, 1]   # Assuming the second column is latitude
+GPS_lon = data[:, 2]   # Assuming the third column is longitude
+print (GPS_lat)
+
+
 
 # 2. Create a GeoDataFrame for the point (Contextily uses Web Mercator projection)
-gdf = gpd.GeoDataFrame(geometry=[Point(lon, lat)], crs="EPSG:4326")
+gdf = gpd.GeoDataFrame(geometry=[Point(lon_0, lat_0)], crs="EPSG:4326")
 gdf = gdf.to_crs(epsg=3857)  # Convert to standard web map projection
 
 # 3. Initialize Matplotlib plot
 fig, ax = plt.subplots(figsize=(8, 8), dpi=100)
 
 transformer = Transformer.from_crs("EPSG:3857", "EPSG:4326", always_xy=True)
+
 
 # 4. Set map boundaries (buffer size determines how much of the block is seen)
 buffer = 1000  # meters around the point
@@ -46,6 +60,20 @@ ax.yaxis.set_major_formatter(FuncFormatter(format_lat))
 
 ax.set_xlabel("Longitude")
 ax.set_ylabel("Latitude")
+
+scalebar = AnchoredSizeBar(
+	ax.transData,
+	buffer/5,
+	f"{buffer/5:.0f} m",
+	"lower right",
+	pad=0.5,
+	color="black",
+	frameon=False,
+	size_vertical=10,
+	fontproperties=fm.FontProperties(size=10),
+)
+ax.add_artist(scalebar)
+
 
 plt.savefig("map.png", dpi=300, bbox_inches="tight")
 plt.show()
