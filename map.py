@@ -14,11 +14,13 @@ lat_0, lon_0 = 21.0285, 105.8542
 
 
 
+
 data = np.loadtxt("GPS.dat", delimiter=",", skiprows=1)  # Load your data from a text file
 GPS_time = data[:, 0]  # Assuming the first column is time
 GPS_lat = data[:, 1]   # Assuming the second column is latitude
 GPS_lon = data[:, 2]   # Assuming the third column is longitude
-print (GPS_lat)
+
+
 
 
 
@@ -38,7 +40,7 @@ ax.set_xlim(gdf.geometry.x.iloc[0] - buffer, gdf.geometry.x.iloc[0] + buffer)
 ax.set_ylim(gdf.geometry.y.iloc[0] - buffer, gdf.geometry.y.iloc[0] + buffer)
 
 # 5. Add the OpenStreetMap background tiles
-zoom = 17
+zoom = 14
 ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik, zoom=zoom)
 
 # Show coordinate ticks in longitude/latitude while keeping the map in Web Mercator.
@@ -73,6 +75,16 @@ scalebar = AnchoredSizeBar(
 	fontproperties=fm.FontProperties(size=10),
 )
 ax.add_artist(scalebar)
+
+# Plot GPS track/points if data was loaded
+gps_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(GPS_lon, GPS_lat), crs="EPSG:4326")
+gps_gdf = gps_gdf.to_crs(epsg=3857)
+# Plot line connecting points
+ax.plot(gps_gdf.geometry.x, gps_gdf.geometry.y, color="red", linewidth=1, label="GPS Track")
+# Plot points
+ax.scatter(gps_gdf.geometry.x, gps_gdf.geometry.y, color="red", s=20)
+ax.legend()
+
 
 
 plt.savefig("map.png", dpi=300, bbox_inches="tight")
