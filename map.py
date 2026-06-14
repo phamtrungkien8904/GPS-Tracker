@@ -15,11 +15,12 @@ lat_0, lon_0 = 21.0285, 105.8542
 
 
 
-data = np.loadtxt("GPS.dat", delimiter=",", skiprows=1)  # Load your data from a text file
-GPS_time = data[:, 0]  # Assuming the first column is time
-GPS_lat = data[:, 1]   # Assuming the second column is latitude
-GPS_lon = data[:, 2]   # Assuming the third column is longitude
+data = np.genfromtxt("GPS.dat", delimiter=",", skip_header=1, dtype=str)  # Load your data as strings first
+GPS_time = np.array([np.datetime64(t) for t in data[:, 0]])  # Convert timestamp strings to datetime
+GPS_lat = data[:, 1].astype(float)   # Assuming the second column is latitude
+GPS_lon = data[:, 2].astype(float)   # Assuming the third column is longitude
 
+print("GPS Time:", GPS_time)
 
 
 
