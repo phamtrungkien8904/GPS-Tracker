@@ -1,4 +1,4 @@
-# pip install contextily geopandas shapely
+# pip install contextily geopandas shapely matplotlib-map-utils
 import numpy as np
 import matplotlib.pyplot as plt
 import contextily as ctx
@@ -30,7 +30,8 @@ gdf = gpd.GeoDataFrame(geometry=[Point(lon_0, lat_0)], crs="EPSG:4326")
 gdf = gdf.to_crs(epsg=3857)  # Convert to standard web map projection
 
 # 3. Initialize Matplotlib plot
-fig, ax = plt.subplots(figsize=(8, 8), dpi=100)
+fig, ax = plt.subplots(figsize=(6, 6), dpi=80)
+
 
 transformer = Transformer.from_crs("EPSG:3857", "EPSG:4326", always_xy=True)
 
@@ -88,5 +89,5 @@ ax.legend()
 
 
 
-plt.savefig("map.png", dpi=300, bbox_inches="tight")
+plt.savefig("map.png", bbox_inches="tight")
 plt.show()
