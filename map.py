@@ -30,19 +30,19 @@ gdf = gpd.GeoDataFrame(geometry=[Point(lon_0, lat_0)], crs="EPSG:4326")
 gdf = gdf.to_crs(epsg=3857)  # Convert to standard web map projection
 
 # 3. Initialize Matplotlib plot
-fig, ax = plt.subplots(figsize=(6, 6), dpi=80)
+fig, ax = plt.subplots(figsize=(8, 8), dpi=100)
 
 
 transformer = Transformer.from_crs("EPSG:3857", "EPSG:4326", always_xy=True)
 
 
 # 4. Set map boundaries (buffer size determines how much of the block is seen)
-buffer = 1000  # meters around the point
+buffer = 10000  # meters around the point
 ax.set_xlim(gdf.geometry.x.iloc[0] - buffer, gdf.geometry.x.iloc[0] + buffer)
 ax.set_ylim(gdf.geometry.y.iloc[0] - buffer, gdf.geometry.y.iloc[0] + buffer)
 
 # 5. Add the OpenStreetMap background tiles
-zoom = 14
+zoom = 12
 ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik, zoom=zoom)
 
 # Show coordinate ticks in longitude/latitude while keeping the map in Web Mercator.
@@ -67,13 +67,13 @@ ax.set_ylabel("Latitude")
 
 scalebar = AnchoredSizeBar(
 	ax.transData,
-	buffer/5,
-	f"{buffer/5:.0f} m",
+	buffer/2,
+	f"{buffer/2:.0f} m",
 	"lower right",
 	pad=0.5,
 	color="black",
 	frameon=False,
-	size_vertical=10,
+	size_vertical=20,
 	fontproperties=fm.FontProperties(size=10),
 )
 ax.add_artist(scalebar)
