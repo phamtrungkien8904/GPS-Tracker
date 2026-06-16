@@ -6,10 +6,7 @@ import geopandas as gpd
 from shapely.geometry import Point
 from pyproj import Transformer
 from matplotlib.ticker import MaxNLocator, FuncFormatter
-from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
-import matplotlib.font_manager as fm
 from matplotlib.patches import Rectangle
-from matplotlib.patches import Polygon
 
 # Custom settings
 plt.style.use('classic')
@@ -51,20 +48,16 @@ inch = 2.54  # cm per inch
 lat_0, lon_0 = 21.0285, 105.8542  
 # lat_0, lon_0 = 48.137154, 11.576124  # Munich Center Coordinates
 
+# Parameters for map display
 buffer_x = 1000000  # meters around the point
-buffer_y = 1000000  # meters around the point
-
-
+buffer_y = 1000000 # meters around the point
+zoom = 6  # Zoom level for contextily (1-19, higher is more zoomed in. 1-6 is continent, 7-10 is city, 11-14 is street, 15-19 is building)
 
 
 data = np.genfromtxt("GPS.dat", delimiter=",", skip_header=1, dtype=str)  # Load your data as strings first
 GPS_time = np.array([np.datetime64(t) for t in data[:, 0]])  # Convert timestamp strings to datetime
 GPS_lat = data[:, 1].astype(float)   # Assuming the second column is latitude
 GPS_lon = data[:, 2].astype(float)   # Assuming the third column is longitude
-
-print("GPS Time:", GPS_time)
-
-
 
 
 # 2. Create a GeoDataFrame for the point (Contextily uses Web Mercator projection)
@@ -79,14 +72,12 @@ ax.set_aspect('equal')
 
 transformer = Transformer.from_crs("EPSG:3857", "EPSG:4326", always_xy=True)
 
-
 # 4. Set map boundaries (buffer size determines how much of the block is seen)
 
 ax.set_xlim(gdf.geometry.x.iloc[0] - buffer_x, gdf.geometry.x.iloc[0] + buffer_x)
 ax.set_ylim(gdf.geometry.y.iloc[0] - buffer_y, gdf.geometry.y.iloc[0] + buffer_y)
 
 # 5. Add the OpenStreetMap background tiles
-zoom = 6
 ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik, zoom=zoom)
 
 # Show coordinate ticks in longitude/latitude while keeping the map in Web Mercator.
@@ -172,19 +163,19 @@ def add_fancy_scalebar(ax, length, location,
 
     # Labels
     ax.text(x0, y0 - text_offset, "0",
-            ha='center', va='top', fontsize=10)
+            ha='center', fontsize=10)
 
     ax.text(x0 + segment, y0 - text_offset,
             f"{segment/1000:g}",
-            ha='center', va='top', fontsize=10)
+            ha='center', fontsize=10)
 
     ax.text(x0 + length, y0 - text_offset,
             f"{length/1000:g}",
-            ha='center', va='top', fontsize=10)
+            ha='center', fontsize=10)
 
-    ax.text(x0 + segment, y0 + 3*text_offset,
+    ax.text(x0 + segment, y0 + 0.75*text_offset,
             "km",
-            ha='center', va='top', fontsize=10)
+            ha='center', fontsize=10)
 
 add_fancy_scalebar(
     ax,
@@ -192,7 +183,7 @@ add_fancy_scalebar(
     location=(0.72, 0.05),
     height=buffer_y/50,  # 1% of the y-range
     linewidth=1.5,
-    text_offset=buffer_y/50  # 2% of the y-range
+    text_offset=buffer_y/20  # 2% of the y-range
 )
 
 
@@ -201,3 +192,6 @@ ax.legend()
 
 plt.savefig("map.png", bbox_inches="tight")
 plt.show()
+
+
+
