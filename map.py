@@ -15,7 +15,7 @@ from matplotlib.patches import Polygon
 plt.style.use('classic')
 plt.rcParams.update({
     'figure.dpi': 100,
-    'figure.figsize': (10, 8),
+    'figure.figsize': (11.69, 8.27),  # A4 size in inches
     'figure.facecolor': 'white',
     'axes.facecolor': 'white',
     'axes.edgecolor': 'black',
@@ -48,11 +48,12 @@ plt.rcParams.update({
 inch = 2.54  # cm per inch
 
 # Hanoi Center Coordinates
-lat_0, lon_0 = 21.0285, 105.8542  
+# lat_0, lon_0 = 21.0285, 105.8542  
 # lat_0, lon_0 = 48.137154, 11.576124  # Munich Center Coordinates
+lat_0, lon_0 = 48.150499398, 11.582831034  # LMU Coordinates
 
-buffer_x = 1000000  # meters around the point
-buffer_y = 1000000  # meters around the point
+buffer_x = 1000  # meters around the point
+buffer_y = 800  # meters around the point
 
 
 
@@ -86,7 +87,7 @@ ax.set_xlim(gdf.geometry.x.iloc[0] - buffer_x, gdf.geometry.x.iloc[0] + buffer_x
 ax.set_ylim(gdf.geometry.y.iloc[0] - buffer_y, gdf.geometry.y.iloc[0] + buffer_y)
 
 # 5. Add the OpenStreetMap background tiles
-zoom = 6
+zoom = 17
 ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik, zoom=zoom)
 
 # Show coordinate ticks in longitude/latitude while keeping the map in Web Mercator.
@@ -95,12 +96,12 @@ ax.yaxis.set_major_locator(MaxNLocator(nbins=5))
 
 def format_lon(x, _pos):
 	lon, _lat = transformer.transform(x, gdf.geometry.y.iloc[0])
-	return f"{lon:.5f}"
+	return f"{lon:.2f}"
 
 
 def format_lat(y, _pos):
 	_lon, lat = transformer.transform(gdf.geometry.x.iloc[0], y)
-	return f"{lat:.5f}"
+	return f"{lat:.2f}"
 
 
 ax.xaxis.set_major_formatter(FuncFormatter(format_lon))
@@ -197,7 +198,7 @@ add_fancy_scalebar(
 
 
 
-ax.legend()
+# ax.legend()
 
-plt.savefig("map.png", bbox_inches="tight")
+plt.savefig("map.png",dpi=600, bbox_inches="tight")
 plt.show()
