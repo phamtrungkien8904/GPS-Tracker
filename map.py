@@ -58,12 +58,29 @@ buffer_y = 800  # meters around the point
 
 
 
-data = np.genfromtxt("GPS.dat", delimiter=",", skip_header=1, dtype=str)  # Load your data as strings first
-GPS_time = np.array([np.datetime64(t) for t in data[:, 0]])  # Convert timestamp strings to datetime
-GPS_lat = data[:, 1].astype(float)   # Assuming the second column is latitude
-GPS_lon = data[:, 2].astype(float)   # Assuming the third column is longitude
 
-print("GPS Time:", GPS_time)
+data = np.genfromtxt("gps_data.csv", delimiter=",", skip_header=1, dtype=str)  # Load your data as strings first
+valid_rows = (
+    (data[:, 0] != "") &
+    (data[:, 1] != "") &
+    (data[:, 2] != "") &
+    (data[:, 3] != "")
+)
+
+data = data[valid_rows]
+GPS_time = np.array(
+    [
+        np.datetime64(f"{date}T{time}")
+        for date, time in zip(data[:, 0], data[:, 1])
+    ],
+    dtype="datetime64[s]"
+)
+
+# GPS_time = date_time_strings.astype("datetime64[s]")
+GPS_lat = data[:, 2].astype(float)   # Assuming the second column is latitude
+GPS_lon = data[:, 3].astype(float)   # Assuming the third column is longitude
+
+# print("GPS Time:", GPS_time)
 
 
 
@@ -87,7 +104,7 @@ ax.set_xlim(gdf.geometry.x.iloc[0] - buffer_x, gdf.geometry.x.iloc[0] + buffer_x
 ax.set_ylim(gdf.geometry.y.iloc[0] - buffer_y, gdf.geometry.y.iloc[0] + buffer_y)
 
 # 5. Add the OpenStreetMap background tiles
-zoom = 17
+zoom = 13
 ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik, zoom=zoom)
 
 # Show coordinate ticks in longitude/latitude while keeping the map in Web Mercator.
@@ -127,7 +144,7 @@ ax.set_ylabel("Latitude")
 gps_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(GPS_lon, GPS_lat), crs="EPSG:4326")
 gps_gdf = gps_gdf.to_crs(epsg=3857)
 # Plot line connecting points
-ax.plot(gps_gdf.geometry.x, gps_gdf.geometry.y, color="red", linewidth=1, label="GPS Track")
+# ax.plot(gps_gdf.geometry.x, gps_gdf.geometry.y, color="red", linewidth=1, label="GPS Track")
 # Plot points
 ax.scatter(gps_gdf.geometry.x, gps_gdf.geometry.y, color="red", s=20)
 
